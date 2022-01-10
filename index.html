@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <title>夕張の実験ノート | 特殊装備対照表</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, user-scale=yes, initial-scale=1.0, maximum-scale=5.0" />
+        <meta name="description" content="「艦これ」における特殊装備が搭載可能な艦の一覧" />
+        <meta name="twitter:card" content="summary" />
+        <meta property="og:url" content="https://yubari-exp.dev/kset/" />
+        <meta property="og:title" content="夕張の実験ノート | 特殊装備対照表" />
+        <meta property="og:description" content="「艦これ」における特殊装備が搭載可能な艦の一覧" />
+        <meta property="og:image" content="../android-chrome-256x256.png" />
+        <link href="stylesheet.css" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css?family=Noto+Sans+JP:900&display=swap&subset=japanese&text=%E7%89%B9%E6%AE%8A%E8%A3%85%E5%82%99%E5%AF%BE%E7%85%A7%E8%A1%A8%EF%BC%88%CE%B2%EF%BC%89%E2%97%8B" rel="stylesheet"/>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script type="text/javascript" src="output.js"></script>
+    </head>
+    <body>
+        <header>
+            <p><a href="../">夕張の実験ノート</a></p>
+        </header>
+        <div id="main">
+            <h2>特殊装備対照表（β）</h2>
+
+            <select id="select-type">
+                <option value="-1">選択してください</option>
+            </select>
+
+            <label><input type="checkbox" value='0'/>大発動艇</label>
+            <label><input type="checkbox" value='1'/>特二式内火艇</label>
+            <label><input type="checkbox" value='2'/>中型バルジ</label>
+            <label><input type="checkbox" value='3'/>司令部施設</label>
+            <label><input type="checkbox" value='4'/>大型電探</label>
+            <label><input type="checkbox" value='5'/>大型ソナー</label>
+
+            <hr />
+
+            <table id="equipment-table">
+                <thead>
+                    <tr>
+                        <th>艦名</th>
+                        <th class="col_eq0">大発動艇</th>
+                        <th class="col_eq1">特二式内火艇</th>
+                        <th class="col_eq2">中型バルジ</th>
+                        <th class="col_eq3">司令部施設</th>
+                        <th class="col_eq4">大型電探</th>
+                        <th class="col_eq5">大型ソナー</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+            <hr />
+            <dl>
+                <dt>これは何？</dt>
+                <dd>2022年1月時点における特殊装備（上陸用舟艇、バルジなど）と、搭載できる艦娘の対照表を出力するページです。名前等は図鑑内表記に準拠しています。
+                    <a href="https://wikiwiki.jp/kancolle/">艦これ wiki</a> 様の情報を参考にしています。<br />
+                    現時点では駆逐艦のみ対応しております。
+                </dd>
+            </dl>
+        </div>
+    </body>
+</html>

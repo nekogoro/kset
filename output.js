@@ -11,6 +11,10 @@ $(function() {
 
     $('#select-type').change(function() {
         $('#equipment-table tbody').empty();
+        $('input[type=checkbox]').prop('checked', true);
+        for (var i=0; i<eq_checked.length; i++) {
+            eq_checked[i] = true;
+        }
         type_id = $(this).val();
         if (type_id < 0) {
             $('input[type=checkbox]').prop('disabled', true);

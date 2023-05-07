@@ -1,6 +1,7 @@
 $(function() {
     var type_id;
     var eq_checked = [true, true, true, true, true, true];
+    var all_color = "transparent";
 
     $.getJSON('data/equipments_table.json', function(data) {
         for(var i=0; i<data.length; i++) {
@@ -14,6 +15,7 @@ $(function() {
         $('input[type=checkbox]').prop('checked', true);
         for (var i=0; i<eq_checked.length; i++) {
             eq_checked[i] = true;
+            $(`.col_eq${i}`).show();
         }
         type_id = $(this).val();
         if (type_id < 0) {
@@ -36,7 +38,7 @@ $(function() {
             }
     });
 
-    $('input[type=checkbox]').change(function() {
+    $('input[name=equipment]').change(function() {
         var value = $(this).val();
         var num = parseInt(value);
         if ($(this).is(':checked')) {
@@ -46,25 +48,44 @@ $(function() {
             $(`.col_eq${value}`).hide();
             eq_checked[num] = false;
         }
+        output_table(type_id, eq_checked, all_color);
+    });
 
-        $.getJSON('data/equipments_table.json', function(data) {
-            for (var i=0; i<data[type_id].items.length; i++) {
-                var show_flag = false;
-                for (var j=0; j<data[type_id].items[i].eq.length; j++) {
-                    if (eq_checked[j] === false) {
-                        continue;
-                    }
-                    if (data[type_id].items[i].eq[j] !== "") {
-                        show_flag = true;
-                        break;
-                    }
-                }
-                if (show_flag === true) {
-                    $('#ship_' + i).show();
-                } else {
-                    $('#ship_' + i).hide();
-                }
-            }
-        });
+    $('input[name=color]').change(function() {
+        all_color = $(this).val();
+        output_table(type_id, eq_checked, all_color);
     });
 });
+
+function output_table(type_id, eq_checked, all_color) {
+    $.getJSON('data/equipments_table.json', function(data) {
+        for (var i=0; i<data[type_id].items.length; i++) {
+            var show_flag = false;
+            var all_flag = true;
+            var checked_num = $('input[name=equipment]:checked').length;
+            for (var j=0; j<data[type_id].items[i].eq.length; j++) {
+                if (eq_checked[j] === false) {
+                    continue;
+                }
+                if (data[type_id].items[i].eq[j] !== "") {
+                    show_flag = true;
+                } else {
+                    all_flag = false;
+                }
+                if (show_flag === true && all_flag === false) {
+                    break;
+                }
+            }
+            if (show_flag === true) {
+                $('#ship_' + i).show();
+            } else {
+                $('#ship_' + i).hide();
+            }
+            if (all_flag === true && checked_num > 1) {
+                $('#ship_' + i).css('background-color', all_color);
+            } else {
+                $('#ship_' + i).css('background-color', 'transparent');
+            }
+        }
+    });
+}

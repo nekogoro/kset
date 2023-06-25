@@ -1,6 +1,7 @@
 $(function() {
     var type_id;
-    var eq_checked = [true, true, true, true, true, true];
+    var eq_checked = [true, true, true, true, true, true, true, true];
+    var checked_num = [8];
     var all_color = "transparent";
 
     $.getJSON('data/equipments_table.json', function(data) {

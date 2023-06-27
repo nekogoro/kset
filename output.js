@@ -25,10 +25,10 @@ $(function() {
             $('input[type=checkbox]').prop('disabled', false);
             $.getJSON('data/equipments_table.json', function(data) {
                 for(var i=0; i<data[type_id].items.length; i++) {
-                    var name = data[type_id].items[i].name;
+                    var ship_name = data[type_id].items[i].name;
                     var ship_id = 'ship_' + i;
                     $('#equipment-table tbody').append('<tr id="'+ship_id+'"></tr>')
-                    $('#'+ship_id).append('<td><a href="https://wikiwiki.jp/kancolle/'+name+'" target="_blank">'+name+'</td>');
+                    $('#'+ship_id).append(generate_ship_name_col(ship_name));
                     for(var j=0; j<data[type_id].items[i].eq.length; j++) {
                         var eq_class = 'col_eq' + j;
                         var eq_enable = shorten_eq_col(data[type_id].items[i].eq[j]);
@@ -36,7 +36,7 @@ $(function() {
                     }
                 }
             });
-            }
+        }
     });
 
     $('input[name=equipment]').change(function() {
@@ -97,8 +97,19 @@ function output_table(type_id, eq_checked, all_color) {
             } else {
                 $('#ship_' + i).css('background-color', 'transparent');
             }
-        }
+        }        
     });
+}
+
+function generate_ship_name_col(ship_name) {
+    const TAG_TD_1 = '<td>';
+    const TAG_TD_2 = '</td>';
+    const TAG_LINK_1 = '<a href="https://wikiwiki.jp/kancolle/';
+    const TAG_LINK_2 = '" target="_blank">';
+    if (ship_name.indexOf("型") !== -1) {
+        return TAG_TD_1 + ship_name + TAG_TD_2;
+    }
+    return TAG_TD_1 + TAG_LINK_1 + ship_name + TAG_LINK_2 + ship_name + TAG_TD_2;
 }
 
 function shorten_eq_col(eq_col) {

@@ -31,7 +31,7 @@ $(function() {
                     $('#'+ship_id).append('<td><a href="https://wikiwiki.jp/kancolle/'+name+'" target="_blank">'+name+'</td>');
                     for(var j=0; j<data[type_id].items[i].eq.length; j++) {
                         var eq_class = 'col_eq' + j;
-                        var eq_enable = data[type_id].items[i].eq[j];
+                        var eq_enable = shorten_eq_col(data[type_id].items[i].eq[j]);
                         $('#'+ship_id).append('<td class="cell '+eq_class+'">'+eq_enable+'</td>');
                     }
                 }
@@ -56,6 +56,16 @@ $(function() {
         all_color = $(this).val();
         output_table(type_id, eq_checked, all_color);
     });
+
+    $('input[name=shorten]').change(function() {
+        if ($(this).is(':checked')) {
+            $('.long').hide();
+            $('.short').show();
+        } else {
+            $('.long').show();
+            $('.short').hide();
+        }
+    })
 });
 
 function output_table(type_id, eq_checked, all_color) {
@@ -89,4 +99,51 @@ function output_table(type_id, eq_checked, all_color) {
             }
         }
     });
+}
+
+function shorten_eq_col(eq_col) {
+    const BR = '<br/>';
+    const COMMA =',';
+
+    if (eq_col.length === 1) {
+        return eq_col;
+    }
+    if (eq_col.indexOf(COMMA) === -1) {
+        return generate_eq_name(eq_col);
+    }
+    var array = eq_col.split(COMMA);
+    var new_eq_col = '';
+    for (var i=0; i<array.length; i++) {
+        new_eq_col += generate_eq_name(array[i]) + BR;
+    }
+    return new_eq_col.slice(0, -5);
+}
+
+function generate_eq_name(eq_name) {
+    const CLASS_1 = '<span class="';
+    const CLASS_2 = '">';
+    const CLASS_3 = '</span>'
+    const CLASS_L = 'long';
+    const CLASS_S = 'short';
+
+    return CLASS_1 + CLASS_L + CLASS_2 + eq_name + CLASS_3
+        + CLASS_1 + CLASS_S + CLASS_2 + shorten_eq_name(eq_name) + CLASS_3;
+
+}
+
+function shorten_eq_name(eq_name) {
+    switch(eq_name) {
+        case "13号対空電探系":
+            return "13号電探系";
+        case "22号水上電探系":
+            return "22号電探系";
+        case "電探装備マスト(13号改＋22号電探改四)":
+            return "電探マスト";
+        case "精鋭水雷戦隊 司令部":
+            return "水雷司令部";
+        case "増加爆雷":
+            return "爆雷";
+        default:
+            return eq_name;
+    }
 }

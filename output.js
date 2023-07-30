@@ -154,6 +154,8 @@ function shorten_eq_name(eq_name) {
             return "水雷司令部";
         case "増加爆雷":
             return "爆雷";
+        case "強化型艦本式缶・新型高温高圧缶":
+            return "強化缶・新型缶";
         default:
             return eq_name;
     }

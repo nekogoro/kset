@@ -52,6 +52,17 @@ $(function() {
         output_table(type_id, eq_checked, all_color);
     });
 
+    $('button[id=reset_all_checks]').on('click', function() {
+        eq_checked.forEach(function(value, index) {
+            $(`.col_eq${index}`).hide();
+            eq_checked[index] = false;
+        });
+        $('input[name=equipment]').each(function() {
+            this.checked = false;
+        })
+        output_table(type_id, eq_checked, all_color);
+    });
+
     $('input[name=color]').change(function() {
         all_color = $(this).val();
         output_table(type_id, eq_checked, all_color);

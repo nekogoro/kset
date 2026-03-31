@@ -169,6 +169,8 @@ function shorten_eq_name(eq_name) {
             return "爆雷投射機";
         case "強化型艦本式缶・新型高温高圧缶":
             return "強化缶・新型缶";
+        case "12.7cm単装高角砲改二(★+7以上)":
+            return "12.7cm単装高角砲改二"
         default:
             return eq_name;
     }

@@ -1,123 +1,182 @@
-$(function() {
+document.addEventListener('DOMContentLoaded', function() {
     var tableData = null;
     var type_id = -1;
     var eq_checked = {};
     var all_color = "transparent";
 
-    $.getJSON('data/equipments_table.json', function(data) {
-        tableData = data;
-        buildEquipmentFilters(data.equipments);
-        buildTableHeader(data.equipments);
-        for (var i = 0; i < data.types.length; i++) {
-            $('#select-type').append($('<option>').attr('value', i).text(data.types[i].type));
-        }
-        if (data.updated_at) {
-            $('#updated-at').text(data.updated_at);
-        }
-        $('input[name=equipment]').prop('disabled', true).prop('checked', true);
-    }).fail(function() {
-        $('#equipment-table tbody').append('<tr><td>データの読み込みに失敗しました。</td></tr>');
-    });
+    fetch('data/equipments_table.json')
+        .then(function(response) {
+            if (!response.ok) {
+                throw new Error('HTTP ' + response.status);
+            }
+            return response.json();
+        })
+        .then(function(data) {
+            tableData = data;
+            buildEquipmentFilters(data.equipments);
+            buildTableHeader(data.equipments);
+            var select = document.getElementById('select-type');
+            for (var i = 0; i < data.types.length; i++) {
+                var option = document.createElement('option');
+                option.value = i;
+                option.textContent = data.types[i].type;
+                select.appendChild(option);
+            }
+            if (data.updated_at) {
+                document.getElementById('updated-at').textContent = data.updated_at;
+            }
+            setEquipmentInputs(function(input) {
+                input.disabled = true;
+                input.checked = true;
+            });
+        })
+        .catch(function() {
+            var row = document.createElement('tr');
+            var cell = document.createElement('td');
+            cell.textContent = 'データの読み込みに失敗しました。';
+            row.appendChild(cell);
+            document.querySelector('#equipment-table tbody').appendChild(row);
+        });
+
+    function setEquipmentInputs(fn) {
+        document.querySelectorAll('input[name=equipment]').forEach(fn);
+    }
+
+    function setColumnVisibility(eq_id, visible) {
+        document.querySelectorAll('.col_eq_' + eq_id).forEach(function(el) {
+            el.style.display = visible ? '' : 'none';
+        });
+    }
 
     function buildEquipmentFilters(equipments) {
-        var container = $('#equipment-filters');
-        container.empty();
+        var container = document.getElementById('equipment-filters');
+        container.textContent = '';
         eq_checked = {};
         equipments.forEach(function(eq) {
             eq_checked[eq.id] = true;
-            var label = $('<label>');
-            var checkbox = $('<input>').attr({ type: 'checkbox', name: 'equipment', value: eq.id }).prop('checked', true);
-            label.append(checkbox).append(document.createTextNode(eq.label));
-            container.append(label);
+            var label = document.createElement('label');
+            var checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.name = 'equipment';
+            checkbox.value = eq.id;
+            checkbox.checked = true;
+            label.appendChild(checkbox);
+            label.appendChild(document.createTextNode(eq.label));
+            container.appendChild(label);
         });
     }
 
     function buildTableHeader(equipments) {
-        var headerRow = $('#equipment-header');
-        headerRow.empty();
-        headerRow.append($('<th>').text('艦名'));
+        var headerRow = document.getElementById('equipment-header');
+        headerRow.textContent = '';
+        var nameTh = document.createElement('th');
+        nameTh.textContent = '艦名';
+        headerRow.appendChild(nameTh);
         equipments.forEach(function(eq) {
-            headerRow.append($('<th>').addClass('col_eq_' + eq.id).text(eq.label));
+            var th = document.createElement('th');
+            th.className = 'col_eq_' + eq.id;
+            th.textContent = eq.label;
+            headerRow.appendChild(th);
         });
     }
 
-    $('#select-type').change(function() {
+    document.getElementById('select-type').addEventListener('change', function(event) {
         if (!tableData) {
             return;
         }
-        $('#equipment-table tbody').empty();
-        $('input[name=equipment]').prop('checked', true);
+        document.querySelector('#equipment-table tbody').textContent = '';
+        setEquipmentInputs(function(input) {
+            input.checked = true;
+        });
         tableData.equipments.forEach(function(eq) {
             eq_checked[eq.id] = true;
-            $('.col_eq_' + eq.id).show();
+            setColumnVisibility(eq.id, true);
         });
-        type_id = parseInt($(this).val(), 10);
+        type_id = parseInt(event.target.value, 10);
         if (isNaN(type_id) || type_id < 0 || type_id >= tableData.types.length) {
-            $('input[name=equipment]').prop('disabled', true);
+            setEquipmentInputs(function(input) {
+                input.disabled = true;
+            });
             type_id = -1;
             return;
         }
-        $('input[name=equipment]').prop('disabled', false);
+        setEquipmentInputs(function(input) {
+            input.disabled = false;
+        });
         renderTableBody(tableData.types[type_id].items);
     });
 
     function renderTableBody(items) {
-        var tbody = $('#equipment-table tbody');
-        tbody.empty();
+        var tbody = document.querySelector('#equipment-table tbody');
+        tbody.textContent = '';
         for (var i = 0; i < items.length; i++) {
-            var ship_id = 'ship_' + i;
-            var row = $('<tr>').attr('id', ship_id);
-            row.append(generate_ship_name_col(items[i].name));
+            var row = document.createElement('tr');
+            row.id = 'ship_' + i;
+            row.appendChild(generate_ship_name_col(items[i].name));
             tableData.equipments.forEach(function(eq) {
                 var value = items[i].eq[eq.id];
-                var cell = $('<td>').addClass('cell col_eq_' + eq.id);
-                cell.append(shorten_eq_col(value));
-                row.append(cell);
+                var cell = document.createElement('td');
+                cell.className = 'cell col_eq_' + eq.id;
+                appendEqValue(cell, value);
+                row.appendChild(cell);
             });
-            tbody.append(row);
+            tbody.appendChild(row);
         }
     }
 
-    $(document).on('change', 'input[name=equipment]', function() {
-        var id = $(this).val();
-        if ($(this).is(':checked')) {
-            $('.col_eq_' + id).show();
-            eq_checked[id] = true;
+    function appendEqValue(cell, value) {
+        var node = shorten_eq_col(value);
+        if (Array.isArray(node)) {
+            cell.append.apply(cell, node);
         } else {
-            $('.col_eq_' + id).hide();
-            eq_checked[id] = false;
+            cell.appendChild(node);
         }
-        output_table();
+    }
+
+    document.addEventListener('change', function(event) {
+        if (event.target.matches('input[name=equipment]')) {
+            var id = event.target.value;
+            if (event.target.checked) {
+                setColumnVisibility(id, true);
+                eq_checked[id] = true;
+            } else {
+                setColumnVisibility(id, false);
+                eq_checked[id] = false;
+            }
+            output_table();
+        } else if (event.target.matches('input[name=color]')) {
+            all_color = event.target.value;
+            output_table();
+        } else if (event.target.matches('input[name=shorten]')) {
+            setShortenDisplay(event.target.checked);
+        }
     });
 
-    $('button[id=reset_all_checks]').on('click', function() {
+    function setShortenDisplay(shorten) {
+        // .long は stylesheet でも display:none のため、通常表示時は
+        // inline 指定で上書きする必要がある（jQuery .show() と同等）
+        document.querySelectorAll('.long').forEach(function(el) {
+            el.style.display = shorten ? 'none' : 'inline';
+        });
+        document.querySelectorAll('.short').forEach(function(el) {
+            el.style.display = shorten ? '' : 'none';
+        });
+    }
+
+    document.getElementById('reset_all_checks').addEventListener('click', function() {
         if (!tableData) {
             return;
         }
         tableData.equipments.forEach(function(eq) {
-            $('.col_eq_' + eq.id).hide();
+            setColumnVisibility(eq.id, false);
             eq_checked[eq.id] = false;
         });
-        $('input[name=equipment]').each(function() {
-            this.checked = false;
+        setEquipmentInputs(function(input) {
+            input.checked = false;
         });
         output_table();
     });
 
-    $('input[name=color]').change(function() {
-        all_color = $(this).val();
-        output_table();
-    });
-
-    $('input[name=shorten]').change(function() {
-        if ($(this).is(':checked')) {
-            $('.long').hide();
-            $('.short').show();
-        } else {
-            $('.long').show();
-            $('.short').hide();
-        }
-    });
     function output_table() {
         if (!tableData || type_id < 0 || type_id >= tableData.types.length) {
             return;
@@ -126,7 +185,7 @@ $(function() {
         for (var i = 0; i < items.length; i++) {
             var show_flag = false;
             var all_flag = true;
-            var checked_num = $('input[name=equipment]:checked').length;
+            var checked_num = document.querySelectorAll('input[name=equipment]:checked').length;
             for (var j = 0; j < tableData.equipments.length; j++) {
                 var eq_id = tableData.equipments[j].id;
                 if (eq_checked[eq_id] === false) {
@@ -141,31 +200,28 @@ $(function() {
                     break;
                 }
             }
-            if (show_flag === true) {
-                $('#ship_' + i).show();
-            } else {
-                $('#ship_' + i).hide();
-            }
+            var row = document.getElementById('ship_' + i);
+            row.style.display = show_flag === true ? '' : 'none';
             if (all_flag === true && checked_num > 1) {
-                $('#ship_' + i).css('background-color', all_color);
+                row.style.backgroundColor = all_color;
             } else {
-                $('#ship_' + i).css('background-color', 'transparent');
+                row.style.backgroundColor = 'transparent';
             }
         }
     }
 });
 
 function generate_ship_name_col(ship_name) {
-    var td = $('<td>');
+    var td = document.createElement('td');
     if (ship_name.indexOf('型') !== -1) {
-        td.text(ship_name);
+        td.textContent = ship_name;
         return td;
     }
-    var link = $('<a>')
-        .attr('href', 'https://wikiwiki.jp/kancolle/' + encodeURIComponent(ship_name))
-        .attr('target', '_blank')
-        .text(ship_name);
-    td.append(link);
+    var link = document.createElement('a');
+    link.href = 'https://wikiwiki.jp/kancolle/' + encodeURIComponent(ship_name);
+    link.target = '_blank';
+    link.textContent = ship_name;
+    td.appendChild(link);
     return td;
 }
 
@@ -180,7 +236,7 @@ function hasEq(value) {
 }
 
 function shorten_eq_col(eq_col) {
-    var BR = '<br/>';
+    var BR = 'br';
 
     if (eq_col === true) {
         return document.createTextNode('○');
@@ -192,14 +248,23 @@ function shorten_eq_col(eq_col) {
     if (array.length === 1) {
         return eq_col_name_node(array[0]);
     }
-    var span = $('<span>');
+    var span = document.createElement('span');
     for (var i = 0; i < array.length; i++) {
-        span.append(eq_col_name_node(array[i]));
+        appendEqName(span, array[i]);
         if (i < array.length - 1) {
-            span.append(BR);
+            span.appendChild(document.createElement(BR));
         }
     }
     return span;
+}
+
+function appendEqName(parent, eq_name) {
+    var node = eq_col_name_node(eq_name);
+    if (Array.isArray(node)) {
+        parent.append.apply(parent, node);
+    } else {
+        parent.appendChild(node);
+    }
 }
 
 function eq_col_name_node(eq_name) {
@@ -213,12 +278,17 @@ function generate_eq_name(eq_name) {
     var CLASS_L = 'long';
     var CLASS_S = 'short';
 
-    var longSpan = $('<span>').addClass(CLASS_L).text(eq_name).hide();
-    var shortSpan = $('<span>').addClass(CLASS_S).text(shorten_eq_name(eq_name));
+    var longSpan = document.createElement('span');
+    longSpan.className = CLASS_L;
+    longSpan.textContent = eq_name;
+    longSpan.style.display = 'none';
+    var shortSpan = document.createElement('span');
+    shortSpan.className = CLASS_S;
+    shortSpan.textContent = shorten_eq_name(eq_name);
     // NOTE: .long は stylesheet.css で display:none のため初期表示は短縮形。
     // 既存の挙動を維持している。将来的にはデフォルトで long を表示し、
     // 「簡易表示」チェックで short へ切替える形への修正を推奨。
-    return [longSpan[0], shortSpan[0]];
+    return [longSpan, shortSpan];
 }
 
 function shorten_eq_name(eq_name) {

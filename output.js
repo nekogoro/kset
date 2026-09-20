@@ -62,13 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         document.querySelector('#equipment-table tbody').textContent = '';
-        setEquipmentInputs(function(input) {
-            input.checked = true;
-        });
-        tableData.equipments.forEach(function(eq) {
-            eq_checked[eq.id] = true;
-            setColumnVisibility(eq.id, true);
-        });
+        // 装備フィルタの状態は艦種切り替え後も維持する（リセットしない）
         type_id = parseInt(event.target.value, 10);
         if (isNaN(type_id) || type_id < 0 || type_id >= tableData.types.length) {
             setEquipmentInputs(function(input) {
@@ -85,6 +79,11 @@ document.addEventListener('DOMContentLoaded', function() {
             tableData.types[type_id].items,
             tableData.equipments
         );
+        // 再描画した列にフィルタの表示状態を反映し、絞り込みを再適用する
+        tableData.equipments.forEach(function(eq) {
+            setColumnVisibility(eq.id, eq_checked[eq.id] !== false);
+        });
+        output_table();
     });
 
     document.addEventListener('change', function(event) {

@@ -955,14 +955,14 @@
           }
         },
         {
-          "name": "Z1 Zwei",
+          "name": "Z1 zwei",
           "eq": {
             "bulge": true,
             "large_radar": true
           }
         },
         {
-          "name": "Z3 Zwei",
+          "name": "Z3 zwei",
           "eq": {
             "bulge": true,
             "large_radar": true

@@ -22,10 +22,13 @@ export function applyFilter(items, equipments, eq_checked, all_color, checked_nu
         }
         var row = document.getElementById('ship_' + i);
         row.style.display = show_flag === true ? '' : 'none';
+        // 背景色は CSS 変数経由で渡す。既定色は stylesheet 側の
+        // `#equipment-table tbody tr` が持つため、直接 backgroundColor を
+        // 書き換える方式より詳細度競合に強い。
         if (all_flag === true && checked_num > 1) {
-            row.style.backgroundColor = all_color;
+            row.style.setProperty('--row-bg', all_color);
         } else {
-            row.style.backgroundColor = 'transparent';
+            row.style.setProperty('--row-bg', 'transparent');
         }
     }
 }

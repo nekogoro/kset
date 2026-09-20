@@ -1,8 +1,9 @@
 /* Stylesheet from Github */
 
 body {
-  -ms-cud-size-adjust: 100%;
-  -webkit-cud-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
   color: #24292e;
   line-height: 1.5;
   font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol;
@@ -27,7 +28,7 @@ h3 {
 
 header, footer {
   width: 100%;
-  height: 2em;
+  min-height: 2em;
   background-color: #9ACABE;
 }
 
@@ -43,32 +44,40 @@ header a {
   color: white;
 }
 
-table {
-  display: block;
+.table-scroll {
   width: 100%;
   overflow: auto;
+}
+
+table {
+  width: max-content;
+  border-collapse: collapse;
 }
 
 table th, table td {
   padding: 6px 13px;
   border: 1px solid #dfe2e5;
+  white-space: nowrap;
 }
 
-table tr {
-  background-color: #fff;
+#equipment-table thead th:first-child,
+#equipment-table tbody td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+}
+
+#equipment-table tbody td:first-child {
+  background-color: var(--row-bg, #fff);
+}
+
+#equipment-table tbody tr {
+  background-color: var(--row-bg, #fff);
   border-top: 1px solid #c6cbd1;
 }
 
 table thead th {
   background-color: #f6f8fa;
-}
-
-table td input {
-  width: 3em;
-}
-
-table .nodisplay {
-    display: none;
 }
 
 .cell {

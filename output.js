@@ -69,7 +69,7 @@ $(function() {
             var row = $('<tr>').attr('id', ship_id);
             row.append(generate_ship_name_col(items[i].name));
             tableData.equipments.forEach(function(eq) {
-                var value = items[i].eq[eq.id] || '';
+                var value = items[i].eq[eq.id];
                 var cell = $('<td>').addClass('cell col_eq_' + eq.id);
                 cell.append(shorten_eq_col(value));
                 row.append(cell);
@@ -132,7 +132,7 @@ $(function() {
                 if (eq_checked[eq_id] === false) {
                     continue;
                 }
-                if ((items[i].eq[eq_id] || '') !== '') {
+                if (hasEq(items[i].eq[eq_id])) {
                     show_flag = true;
                 } else {
                     all_flag = false;
@@ -169,28 +169,44 @@ function generate_ship_name_col(ship_name) {
     return td;
 }
 
+function hasEq(value) {
+    if (value === true) {
+        return true;
+    }
+    if (Array.isArray(value)) {
+        return value.length > 0;
+    }
+    return value !== undefined && value !== null && value !== '';
+}
+
 function shorten_eq_col(eq_col) {
     var BR = '<br/>';
-    var COMMA = ',';
 
-    if (!eq_col) {
+    if (eq_col === true) {
+        return document.createTextNode('○');
+    }
+    if (!eq_col || (Array.isArray(eq_col) && eq_col.length === 0)) {
         return document.createTextNode('');
     }
-    if (eq_col.length === 1) {
-        return document.createTextNode(eq_col);
+    var array = Array.isArray(eq_col) ? eq_col : String(eq_col).split(',');
+    if (array.length === 1) {
+        return eq_col_name_node(array[0]);
     }
-    if (eq_col.indexOf(COMMA) === -1) {
-        return generate_eq_name(eq_col);
-    }
-    var array = eq_col.split(COMMA);
     var span = $('<span>');
     for (var i = 0; i < array.length; i++) {
-        span.append(generate_eq_name(array[i]));
+        span.append(eq_col_name_node(array[i]));
         if (i < array.length - 1) {
             span.append(BR);
         }
     }
     return span;
+}
+
+function eq_col_name_node(eq_name) {
+    if (eq_name.length === 1) {
+        return document.createTextNode(eq_name);
+    }
+    return generate_eq_name(eq_name);
 }
 
 function generate_eq_name(eq_name) {

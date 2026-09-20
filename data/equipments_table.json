@@ -988,6 +988,26 @@
           }
         },
         {
+          "name": "Mogador改",
+          "eq": {
+            "bulge": true,
+            "large_radar": true,
+            "large_sonar": true
+          }
+        },
+        {
+          "name": "Ташкент",
+          "eq": {
+            "bulge": true
+          }
+        },
+        {
+          "name": "Ташкент改",
+          "eq": {
+            "bulge": true
+          }
+        },
+        {
           "name": "Visby",
           "eq": {
             "headquarters": true
